@@ -1,8 +1,13 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gem 'rails',         '5.1.6'
 gem 'bcrypt',        '3.1.12'
-gem 'bootstrap-sass','3.3.7'
+gem 'faker'
+gem 'will_paginate'
+gem 'bootstrap-will_paginate'
+gem 'bootstrap-sass', '3.3.7'
 gem 'puma',          '3.9.1'
 gem 'sass-rails',    '5.0.6'
 gem 'uglifier',      '3.2.0'
@@ -36,4 +41,4 @@ group :production do
 end
 
 # Windows環境ではtzinfo-dataというgemを含める必要があります
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
