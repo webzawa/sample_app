@@ -7,14 +7,21 @@ class SessionsController < ApplicationController
     @user = User.find_by(email: params[:session][:email].downcase)
     # authenticateメソッドはhas_secure_passwordから、認証失敗の際falseを返す
     if @user&.authenticate(params[:session][:password])
-      # login & redirect to user_page
-      # log_inメソッドはHelperから呼び出し
-      log_in @user
-      # remember user
-      params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
-      # redirect_to の引数にuserを与えているが、Rails側で "user_url(user)"と解釈してくれている
-      # redirect_to @user
-      redirect_back_or @user
+      if @user.activated?
+        # login & redirect to user_page
+        # log_inメソッドはHelperから呼び出し
+        log_in @user
+        # remember user
+        params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
+        # redirect_to の引数にuserを与えているが、Rails側で "user_url(user)"と解釈してくれている
+        # redirect_to @user
+        redirect_back_or @user
+      else
+        message =  'Account not activated.'
+        message += 'Check your email for the activation link.'
+        flash[:warning] = message
+        redirect_to root_url
+      end
     else
       # view error message
       # flash[:danger] = 'Invalid email/password combination' # 本当は正しくない

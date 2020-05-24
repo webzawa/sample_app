@@ -4,8 +4,10 @@ class User < ApplicationRecord
   # before_save { self.email = self.email.downcase }
   # before_save { self.email = email.downcase }
 
-  attr_accessor :remember_token
-  before_save { email.downcase! }
+  attr_accessor :remember_token, :activation_token
+  # before_save { email.downcase! }
+  before_save :downcase_email
+  before_create :create_activation_digest
 
   validates :name,  presence: true, length: { maximum: 50 }
   # ドッド２つ未対応 VALID_EMIAL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -40,11 +42,17 @@ class User < ApplicationRecord
   end
 
   # 渡されたtokenがdigestと一致したらtrueを返却
-  def authenticated?(remember_token)
+  # def authenticated?(remember_token)
+  def authenticated?(attribute, token)
+    # digest = self.send("remember_digest")
+    # digest = self.send("#{attribute}_digest") # selfは省略可
+    digest = send("#{attribute}_digest")
     # 記憶digestがnilの際はfalseを返す
-    return false if remember_digest.nil?
+    # return false if remember_digest.nil?
+    return false if digest.nil?
 
-    BCrypt::Password.new(remember_digest).is_password?(remember_token)
+    # BCrypt::Password.new(remember_digest).is_password?(remember_token)
+    BCrypt::Password.new(digest).is_password?(token)
 
     # 以下の書き方でも良い
     # if remember_digest.nil?
@@ -57,5 +65,28 @@ class User < ApplicationRecord
   # delete login_information
   def forget
     update_attribute(:remember_digest, nil)
+  end
+
+  # account activation
+  def activate
+    # update_attribute(:activated, true)
+    # update_attribute(:activated_at, Time.zone.now)
+    # change 2line to 1line
+    update_columns(activated: true, activated_at: Time.zone.now)
+  end
+
+  def send_activation_email
+    UserMailer.account_activation(self).deliver_now
+  end
+
+  private
+
+  def downcase_email
+    self.email = email.downcase
+  end
+
+  def create_activation_digest
+    self.activation_token = User.new_token
+    self.activation_digest = User.digest(activation_token)
   end
 end
