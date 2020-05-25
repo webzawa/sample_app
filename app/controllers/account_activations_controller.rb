@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 class AccountActivationsController < ApplicationController
-  # before_create :create_activation_digest
-
-  # private
-
-  # def create_activation_digest
-  #   # 有効トークンとDIGESTを作成及び代入する
-  # end
-
   def edit
     user = User.find_by(email: params[:email])
     if user && !user.activated? && user.authenticated?(:activation, params[:id])
