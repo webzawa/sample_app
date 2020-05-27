@@ -5,6 +5,8 @@ source 'https://rubygems.org'
 gem 'rails',         '5.1.6'
 gem 'bcrypt',        '3.1.12'
 gem 'faker'
+gem 'carrierwave'
+gem 'mini_magick'
 gem 'will_paginate'
 gem 'bootstrap-will_paginate'
 gem 'bootstrap-sass', '3.3.7'
@@ -38,6 +40,7 @@ end
 
 group :production do
   gem 'pg', '0.20.0'
+  gem 'fog'
 end
 
 # Windows環境ではtzinfo-dataというgemを含める必要があります

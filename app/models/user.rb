@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  has_many :microposts, dependent: :destroy
+
   # before_save { self.email = self.email.downcase }
   # before_save { self.email = email.downcase }
 
@@ -93,6 +95,14 @@ class User < ApplicationRecord
 
   def password_reset_expired?
     reset_sent_at < 2.hours.ago
+  end
+
+  def feed
+    # 疑問符があることで、SQLクエリに代入する前にidがエスケープされるため、
+    # SQLインジェクション (SQL Injection) と呼ばれる深刻なセキュリティホールを避けることができます。
+    # この場合のid属性は単なる整数 (すなわちself.idはユーザーのid) であるため危険はありませんが、
+    # SQL文に変数を代入する場合は常にエスケープする習慣をぜひ身につけてください。
+    Micropost.where('user_id = ?', id)
   end
 
   private
